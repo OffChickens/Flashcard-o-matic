@@ -12,22 +12,33 @@ function Study() {
     const {deckId} = useParams();
     const [deckData, setDeckData] = useState([]);
     const history = useHistory();
+    const [loading, setLoading] = useState(true);
 
     //fetch the decks data for the given deckId
     useEffect(() => {
+        const abortController = new AbortController();
         async function getCardData() {
             try {
-                const initialDeckData = await readDeck(deckId);
-                setDeckData(initialDeckData);
+                const initialDeckData = await readDeck(deckId, abortController.signal);
+                if (!abortController.signal.aborted) { // Check if the component is still mounted
+                    setDeckData(initialDeckData);
+                    setLoading(false);
+                }
 
             } catch (error) {
                 console.error("Error fetching card data:", error);
             }
         }
         getCardData();
+        return () => {
+            abortController.abort();
+        }
     }, [deckId]); // Run the effect whenever deckId changes
 
     //display a proper header and cards given the deck data
+
+    if (loading === true) return <h3>Loading...</h3>
+
     return (
         <div>
         <div className="container">
@@ -54,7 +65,7 @@ function Study() {
             </div>
         </div>
         <h1 className="container">{deckData.name}</h1>
-        <Card deckId={ parseInt(deckId) }/>
+        <Card deckData={ deckData }/>
         </div>
     )
 }

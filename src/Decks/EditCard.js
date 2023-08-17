@@ -12,7 +12,10 @@ function EditCard() {
     const [cardData, setCardData] = useState([]);
     const history = useHistory();
     const [newCard, setNewCard] = useState(cardData);
-    const [deckData, setDeckData] = useState([])
+    const [deckData, setDeckData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const buttonOne = "Cancel";
+    const buttonTwo = "Submit";
 
     //Fetch the deck data for the given deckId
     useEffect(() => {
@@ -36,12 +39,13 @@ function EditCard() {
                 const initialData = await readCard(cardId);
                 console.log(cardId)
                 setCardData(initialData);
+                setLoading(false);
             } catch (error) {
                 console.error("Error updated card:", error)
             }
         }
         getCardData();
-    }, []);
+    }, [cardId]);
 
     //change handler for the form
     const handleChange = ({ target }) => {
@@ -61,6 +65,10 @@ function EditCard() {
         } catch (error) {
             console.error("Error updating card:", error)
         }
+    }
+
+    if (loading === true) {
+        return <h3>Loading...</h3>
     }
 
     return (
@@ -87,9 +95,9 @@ function EditCard() {
                 </div>
             </div>
             <div className="container">
-                <h2 className>Edit Card</h2>
+                <h2>Edit Card</h2>
             </div>
-            <CardForm handleSubmit={handleSubmit} cardData={cardData} handleChange={handleChange} deckId={deckId}/>
+            <CardForm handleSubmit={handleSubmit} cardData={cardData} handleChange={handleChange} deckId={deckId} buttonOne={buttonOne} buttonTwo={buttonTwo}/>
         </div>
     )
 }

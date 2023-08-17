@@ -24,7 +24,7 @@ function DeckList({deckList}) {
 
     //maps the list of decks in the API as cards
     const displayDeckList = deckList.map((deck) => {
-        return <li className="list-group-item">
+        return <li className="list-group-item" key={deck.id}>
             <div className="d-flex justify-content-between">
                 <h5 className="card-title">{deck.name}</h5>
                 <p>{deck.cards.length} cards</p>

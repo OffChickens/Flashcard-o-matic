@@ -1,38 +1,61 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { readCard, readDeck } from "../utils/api";
+import { readCard, } from "../utils/api";
 import { useHistory } from "react-router-dom";
 
 
 
-function Card( { deckId } ) {
+function Card( { deckData } ) {
     const [cardId, setCardId] = useState(0)
-    const [cardText, setCardText] = useState(null)
+    const [cardText, setCardText] = useState('')
     const [cardList, setCardList] = useState([])
     const [cardContent, setCardContent] = useState([])
     const [cardFlip, setCardFlip] = useState(false)
     const history = useHistory();
+    const [loading, setLoading] = useState(true);
+    const [nextCardLoad, setNextCardLoad] = useState(true);
 
     //Fetch the data for all of the cards in the deck
     useEffect(() => {
+        console.log(`card ${loading}`)
+        const abortController = new AbortController();
+
         async function getCardData() {
             try {
-                const deckData = await readDeck(deckId);
                 setCardList(deckData.cards);
-                if (cardId === 0) setCardId(deckData.cards[0].id)
-
-                const correctCard = deckData.cards.find(card => card.id === cardId);
-                if (correctCard) {
-                    const cardData = await readCard(correctCard.id); // Fetch card details using readCard
-                    setCardText(cardData.front);
-                    setCardContent(cardData)
+                console.log(`card ${loading}`)
+                if (deckData.cards.length > 0) {
+                    if (cardId === 0) setCardId(deckData.cards[0].id);
+                    if (deckData.cards && deckData.cards.length > 0) {
+                        console.log(`card ${loading}`)
+                        const correctCard = deckData.cards.find(card => card.id === cardId);
+                        if (correctCard) {
+                            console.log(`card ${loading}`)
+                            setLoading(false);
+                            const cardData = await readCard(correctCard.id);
+                            setCardText(cardData.front);
+                            setCardContent(cardData);
+                            setNextCardLoad(false);
+                            console.log(`card ${loading}`)
+                                
+                        }
+                    }
+                }   else {
+                setLoading(false);
+                setNextCardLoad(false)
                 }
             } catch (error) {
                 console.error('Error fetching card data:', error);
             }
         }
+
         getCardData();
-    }, [deckId, cardId,]);
+
+        return () => {
+            abortController.abort();
+        };
+    }, [ cardId, ]);
+
         
     //Handle the case of the card being flipped
     const handleFLip = () => {
@@ -54,6 +77,7 @@ function Card( { deckId } ) {
     //Handle the case of pressing the next button, setting the next card in the deck to be displayed on the card
     //If its the last card in the deck, reset the deck or return home
     const handleNext = () => {
+        setNextCardLoad(true);
         if (currentIndex + 1 < cardList.length) {
             setCardId(cardList[currentIndex + 1].id);
             setCardFlip(false);
@@ -67,15 +91,35 @@ function Card( { deckId } ) {
         }
     };
 
+
+
+
+    if (loading === true) {
+        return <h3>Loading...</h3>
+    }
+
+    if (nextCardLoad) {
+        return (
+            <div className="card container container-fluid">
+                <div className="card-body">
+                    <h5 className="card-title">Loading...</h5>
+                </div>
+            </div>
+        )
+    }
+
+
     const currentIndex = cardList.findIndex(card => card.id === cardId)
 
+    console.log(`card ${loading}`)
+
     //If there aren't enough cards in the deck to study, display a message and allow cards to be added
-    if (cardList.length < 3) { 
+    if (cardList.length < 3 || !cardList.length === 0) { 
         return (
             <div className="container container-fluid">
                 <h4>Not enough cards.</h4>
                 <p>You need at least 3 cards to study. There are {cardList.length} cards in this deck.</p>
-                <button className="btn btn-primary" onClick={() => history.push(`/decks/${deckId}/cards/new`)}>Add cards</button>
+                <button className="btn btn-primary" onClick={() => history.push(`/decks/${deckData.id}/cards/new`)}>Add cards</button>
             </div>
         )
     }

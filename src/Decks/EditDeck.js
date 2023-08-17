@@ -8,8 +8,9 @@ import { useParams } from "react-router-dom";
 
 function EditDeck() {
     const history = useHistory();
-    const [deckData, setDeckData] = useState([])
-    const {deckId} = useParams()
+    const [deckData, setDeckData] = useState([]);
+    const {deckId} = useParams();
+    const [loading, setLoading] = useState(true);
     
     const initialFormState = {
         name: "",
@@ -25,12 +26,13 @@ function EditDeck() {
             try {
                 const initialDeckData = await readDeck(deckId);
                 setDeckData(initialDeckData);
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching card data:', error);
             }
         }
         getDeckData();
-    }, []);
+    }, [deckId]);
 
     //change handler for the formn\
     const handleChange = ({ target }) => {
@@ -52,6 +54,10 @@ function EditDeck() {
         } catch (error) {
             console.error("Error updating deck:", error)
         }
+    }
+
+    if (loading === true) {
+        return <h3>Loading...</h3>
     }
 
     return (
@@ -78,15 +84,15 @@ function EditDeck() {
                 </div>
             </div>
             <div className="container">
-                <h2 className>Edit Deck</h2>
+                <h2>Edit Deck</h2>
             </div>
             <form onSubmit={(handleSubmit)}>
                 <div className="col-12">
-                    <label for="name" className="form-label my-2">Name</label>
+                    <label htmlFor="name" className="form-label my-2">Name</label>
                     <input type="text" name="name" className="form-control" id="name" defaultValue={deckData.name} onChange={(handleChange)}/>
                 </div>
                 <div className="col-12">
-                    <label for="description" className="form-label my-2">Description</label>
+                    <label htmlFor="description" className="form-label my-2">Description</label>
                     <textarea type="text" name="description" className="form-control" id="description" defaultValue={deckData.description} onChange={(handleChange)}/>
                 </div>
                 <div className="col-12">

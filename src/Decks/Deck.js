@@ -9,20 +9,27 @@ function Deck() {
     const {deckId} = useParams();
     const history = useHistory();
     const [deckData, setDeckData] = useState([])
+    const [loading, setLoading] = useState(true);
 
     //Fetch the decks data and the card list within it
     useEffect(() => {
+        const abortController = new AbortController();
         async function getCardData() {
             try {
-                const initialDeckData = await readDeck(deckId);
+                const initialDeckData = await readDeck(deckId , abortController.signal);
                 setCardList(initialDeckData.cards);
                 setDeckData(initialDeckData);
+                setLoading(false);
 
             } catch (error) {
                 console.error("Error fetching card data:", error);
             }
         }
         getCardData();
+
+        return () => {
+            abortController.abort();
+        }
     }, [deckId]); // Run the effect whenever deckId changes
 
     //delete handler for the delete buttons on the cards in the list
@@ -70,6 +77,10 @@ function Deck() {
             </li>
         )
     })
+
+    if (loading === true) {
+        return <h3>Loading...</h3>
+    }
 
     return (
         <div className="container">

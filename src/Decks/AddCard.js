@@ -9,20 +9,30 @@ import CardForm from "./CardForm";
 function AddCard() {
     const history = useHistory();
     const {deckId} = useParams();
-    const [deckData, setDeckData] = useState([])
+    const [deckData, setDeckData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const buttonOne = "Done";
+    const buttonTwo = "Save";
 
     //Get the data of the deck that's adding a card
     useEffect(() => {
+        const abortController = new AbortController();
+
         async function getDeckData() {
             try {
-                const initialDeckData = await readDeck(deckId);
+                const initialDeckData = await readDeck(deckId, abortController.signal);
                 setDeckData(initialDeckData);
+                setLoading(false);
 
             } catch (error) {
-                console.error("Error fetching card data:", error);
-            }
+                    console.error("Error fetching card data:", error); 
+                }
         }
         getDeckData();
+
+        return () => {
+            abortController.abort();
+        }
     }, [deckId]); 
 
     //set an initial form state for the form data
@@ -46,10 +56,15 @@ function AddCard() {
         event.preventDefault();
         try {
             await createCard(deckId, formData);
-            history.push(`/decks/${deckId}`)
+            setFormData({...initialFormState});
+            history.go();
         } catch (error) {
             console.error("Error creating card:", error)
         }
+    }
+
+    if (loading === true) {
+        return <h3>Loading...</h3>
     }
 
     return (
@@ -76,9 +91,9 @@ function AddCard() {
                 </div>
             </div>
             <div className="container">
-                <h3 className>{deckData.name}: Add Card</h3>
+                <h3>{deckData.name}: Add Card</h3>
             </div>
-            <CardForm handleSubmit={handleSubmit} cardData={{front:"", back:""}} handleChange={handleChange} />
+            <CardForm handleSubmit={handleSubmit} cardData={{front:"", back:""}} handleChange={handleChange} buttonOne={buttonOne} buttonTwo={buttonTwo} deckId={deckId}/>
         </div>
     )
 }

@@ -33,38 +33,40 @@ function App() {
       getDecks();
   }, []);
 
-  return (
-    <div className="app-routes">
-      <Header />
-      <Switch>
-        <Route exact path="/">
-          <Layout />
-          <DeckList deckList={deckList}/>
-        </Route>
-        <Route path="/decks/:deckId/study">
-          <Study />
-        </Route>
-        <Route path="/decks/new">
-          <CreateDeck />
-        </Route>
-        <Route exact path="/decks/:deckId">
-          <Deck />
-        </Route>
-        <Route path="/decks/:deckId/edit">
-          <EditDeck />
-        </Route>
-        <Route path="/decks/:deckId/cards/new">
-          <AddCard />
-        </Route>
-        <Route path="/decks/:deckId/cards/:cardId/edit">
-          <EditCard />
-        </Route>
-        <Route>
-          <NotFound />
-        </Route>
-      </Switch>
-    </div>
-  );
-}
+
+    return (
+      <div className="app-routes">
+        <Header />
+        <Switch>
+          <Route exact path="/">
+            <Layout />
+            <DeckList deckList={deckList}/>
+          </Route>
+          <Route path="/decks/:deckId/study">
+            <Study />
+          </Route>
+          <Route path="/decks/new">
+            <CreateDeck />
+          </Route>
+          <Route exact path="/decks/:deckId">
+            <Deck />
+          </Route>
+          <Route path="/decks/:deckId/edit">
+            <EditDeck />
+          </Route>
+          <Route path="/decks/:deckId/cards/new">
+            <AddCard />
+          </Route>
+          <Route path="/decks/:deckId/cards/:cardId/edit">
+            <EditCard />
+          </Route>
+          <Route>
+            <NotFound />
+          </Route>
+        </Switch>
+      </div>
+    );
+  }
+
 
 export default App;
