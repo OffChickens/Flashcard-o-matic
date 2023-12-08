@@ -35,7 +35,7 @@ To run the Flashcard-o-matic app on your local machine, follow these steps:
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/your-username/flashcard-o-matic.git
+   git clone https://github.com/offchickens/flashcard-o-matic.git
 
 2. **Install Dependencies**
     cd flashcard-o-matic
